@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+	<script src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+
+	<script>
+		$(document).ready(function (){
+
+            var socket = io.connect();
+            var name = prompt("what is your name?");
+
+            socket.emit('login', {name: name})
+
+            socket.on('initial', function(messages){
+                  var html_string = "";
+            	for(var i = 0; i < messages.length; i++)
+            	{
+	            	html_string += messages[i].name + ": " + messages[i].text + "<br>"
+            	}
+            	$(".cointainer").html(html_string);
+
+            })
+
+            socket.on('new_user', function(message){
+                  $("#new_user").html(message);
+            })
+
+            socket.on('all_messages', function(messages){
+                  var html_string = "";
+                  for(var i = 0; i < messages.length; i++)
+                  {
+                        html_string += messages[i].name + ": " + messages[i].text + "<br>"
+                  }
+                  $(".cointainer").html(html_string);
+            })
+
+            socket.on('log_out', function(message){
+                  $("#new_user").html(message);
+            })
+
+            $("#new_message").submit(function(){
+            	text = $("#text_mes").val();
+            	full_message = {
+            		name: name,
+            		text: text
+            	}
+            	socket.emit('new_message', full_message)
+            	return false;
+            })
+
+        })
+	</script>
+
+	<style>
+		.cointainer{
+			height: 400px;
+			width: 600px;
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+<h1>Something</h1>
+
+<h3 id = "new_user"></h3>
+
+<div class = "cointainer"></div>
+
+<form id = "new_message">
+	<textarea name = "message" id = "text_mes"></textarea>
+	<input type = "submit" value = "Reply">
+</form>
+</body>
+</html>
